@@ -34,6 +34,8 @@ namespace api2
             services.CustomeDbContext(Configuration)
                 .CustomeSwagger(Configuration)
                 .CustomeAutoMapper(Configuration);
+
+            services.AddCors();
           
 
             services.AddControllers();
@@ -50,7 +52,10 @@ namespace api2
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseCors(config =>
+                        config.AllowAnyMethod()
+                                .AllowAnyHeader()
+                                .AllowAnyOrigin());
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
@@ -75,6 +80,8 @@ namespace api2
             services.AddAutoMapper(options =>
             {
                 options.CreateMap<Department, CreateDepartmentDto>().ReverseMap();
+                options.CreateMap<Student, CreateStudentDto>().ReverseMap();
+                options.CreateMap<Teacher, TeacherCreateDto>().ReverseMap();
             });
 
             return services;
