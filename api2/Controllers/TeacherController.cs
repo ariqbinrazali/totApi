@@ -8,6 +8,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using api2.Models.Dtos;
+using Microsoft.EntityFrameworkCore;
 
 namespace api2.Controllers
 {
@@ -32,7 +33,7 @@ namespace api2.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetTeachers()
         {
-            IEnumerable<Teacher> objFromDb = _db.Teachers.OrderBy(x => x.Name).ToList();
+            IEnumerable<Teacher> objFromDb = _db.Teachers.Include(x => x.Department).OrderBy(x => x.Name).ToList();
             return Ok(objFromDb);
         }
         /// <summary>
@@ -45,7 +46,7 @@ namespace api2.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetTeacher(int teacherId)
         {
-            var objFromDb = _db.Teachers.FirstOrDefault(x => x.Id == teacherId);
+            var objFromDb = _db.Teachers.Include(x => x.Department).FirstOrDefault(x => x.Id == teacherId);
             if (objFromDb == null)
             {
                 return NotFound();
@@ -63,20 +64,22 @@ namespace api2.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CreateTeacher(Models.Dtos.TeacherCreateDto TeacherCreateDto)
         {
-
-
+            bool isExist = _db.Teachers.Any(x => x.Email.ToLower().Trim() == TeacherCreateDto.Email.ToLower().Trim());
 
             if (TeacherCreateDto == null)
             {
                 return BadRequest();
             }
+            if (isExist)
+            {
+                ModelState.AddModelError("", "Email already exist");
+                return StatusCode(400, ModelState);
+            }
 
-
-            var teacher = _mapper.Map<Teacher>(TeacherCreateDto);
-            _db.Teachers.Add(teacher);
+            var obj = _mapper.Map<Teacher>(TeacherCreateDto);
+            _db.Teachers.Add(obj);
             _db.SaveChanges();
-
-            return CreatedAtRoute(nameof(GetTeacher), new { teacherId = teacher.Id }, teacher);
+            return CreatedAtRoute(nameof(GetTeacher), new { teacherId = obj.Id }, obj);
         }
 
         /// <summary>
@@ -89,16 +92,24 @@ namespace api2.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult UpdateTeacher(int teacherId, Teacher teacher)
+        public IActionResult UpdateTeacher(int teacherId, Teacher Data)
         {
-            if (teacher == null && teacherId != teacher.Id)
+            bool isExist = _db.Teachers.Any(x => x.Email.ToLower().Trim() == Data.Email.ToLower().Trim());
+
+            if (Data == null)
             {
                 return BadRequest();
             }
+            if (isExist)
+            {
+                ModelState.AddModelError("", "Email already exist");
+                return StatusCode(400, ModelState);
+            }
 
-            _db.Teachers.Update(teacher);
+            var obj = _mapper.Map<Teacher>(Data);
+            _db.Teachers.Update(obj);
             _db.SaveChanges();
-            return NoContent();
+            return CreatedAtRoute(nameof(GetTeacher), new { teacherId = obj.Id }, obj);
         }
 
         /// <summary>

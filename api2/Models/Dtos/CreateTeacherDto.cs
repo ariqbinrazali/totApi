@@ -15,8 +15,11 @@ namespace api2.Models.Dtos
         public int Age { get; set; }
 
         [Required]
+        [EmailAddress]
         public string Email { get; set; }
 
-       
+        [Required]
+        public int DepartmentId { get; set; }
+
     }
 }
