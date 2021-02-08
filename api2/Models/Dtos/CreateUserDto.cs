@@ -7,20 +7,17 @@ using System.Threading.Tasks;
 
 namespace api2.Models.Dtos
 {
-    public class CreateStudentDto
+    public class CreateUserDto
     {
         [Required]
-        public string Name { get; set; }
+        public string Username { get; set; }
 
         [Required]
-        public int Age { get; set; }
+        public string Password { get; set; }
 
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-        
-        [Required]
-        public int DepartmentId { get; set; }
-        
+        public UserRole Role { get; set; }
+
+     
     }
 }

@@ -9,12 +9,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using api2.Models.Dtos;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace api2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize]
     public class TeacherController : ControllerBase
     {
         private readonly ApplicationDBContext _db;
@@ -92,11 +94,13 @@ namespace api2.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult UpdateTeacher(int teacherId, Teacher Data)
+        public IActionResult UpdateTeacher(int teacherId, TeacherUpdateDto Data)
         {
+            
+
             bool isExist = _db.Teachers.Any(x => x.Email.ToLower().Trim() == Data.Email.ToLower().Trim());
 
-            if (Data == null)
+            if (Data == null || Data.Id != teacherId)
             {
                 return BadRequest();
             }

@@ -8,6 +8,7 @@ using api2.Data;
 using api2.Models;
 using api2.Models.Dtos;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace api2.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ProducesResponseType(400)]
+    [Authorize]
     public class DepartmentController : ControllerBase
     {
         private readonly ApplicationDBContext _db;
@@ -26,11 +28,11 @@ namespace api2.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet(Name = nameof(GetAll))]
+        [HttpGet(Name = nameof(GetAllDepartment))]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Department>))]
         [ProducesResponseType(404)]
         
-        public IActionResult GetAll()
+        public IActionResult GetAllDepartment()
         {
             IEnumerable<Department> obj = _db.Departments.OrderBy(x => x.Name).ToList();
 
@@ -47,9 +49,9 @@ namespace api2.Controllers
         [ProducesResponseType(200, Type = typeof(Department))]
         [ProducesResponseType(404)]
         
-        public IActionResult GetDepartment(int departmentid)
+        public IActionResult GetDepartment(int departmentId)
         {
-            var obj = _db.Departments.FirstOrDefault(x => x.Id == departmentid);
+            var obj = _db.Departments.FirstOrDefault(x => x.Id == departmentId);
             if (obj == null)
             {
                 return NotFound();

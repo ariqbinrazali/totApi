@@ -22,8 +22,8 @@ namespace api2.Models
         public string Email { get; set; }
 
         [Required]
-        public int DepartmentID { get; set; }
-        [ForeignKey(nameof(DepartmentID))]
+        public int DepartmentId { get; set; }
+        [ForeignKey(nameof(DepartmentId))]
         public Department Department { get; set; }
     }
 }
